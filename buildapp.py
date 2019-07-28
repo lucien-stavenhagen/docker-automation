@@ -4,6 +4,18 @@ import logging
 import getopt
 import sys
 
+#
+# basically a fancy wrapper class
+# for dockerclient.images.build()
+# to automate building images for my MERN stack
+# sample app from
+# https://github.com/lucien-stavenhagen/MERN-Stack-Example.git
+#
+# documentation for the docker SDK for python, which
+# is used in this script, is here:
+# https://docker-py.readthedocs.io/en/stable/index.html
+#
+
 
 class DockerBuildWrapper:
     def __init__(self, repository, tag, nocache, pull):
@@ -15,6 +27,11 @@ class DockerBuildWrapper:
         self.logfilename = os.path.join(os.curdir, "dockerbuild.log")
         self.__initTags(repository, tag)
         self.__initLogger()
+    #
+    # this is to build repository names
+    # like foobar/rest-server:tagbar for
+    # rest-server and react-client
+    #
 
     def __initTags(self, repository, tag):
         self.server_tag = "{repo}/rest-server".format(repo=repository)
@@ -27,6 +44,12 @@ class DockerBuildWrapper:
         logging.basicConfig(filename=self.logfilename,
                             filemode="w", level=logging.INFO)
         self.logger = logging.getLogger(__name__)
+
+    #
+    # try to slightly translate the logging output
+    # returned from dockerclient.images.build()
+    # and put it in a Python logger
+    #
 
     def __decodeLogs(self, log_generator_object):
         for log_dict in log_generator_object:
