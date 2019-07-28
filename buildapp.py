@@ -56,19 +56,19 @@ class DockerBuildWrapper:
     def buildReactClient(self):
         self.__buildImage(self.client_dockerfile, self.client_tag)
 
-    def buildAll(self):
-        self.buildRestServer()
-        self.buildReactClient()
-
 
 def usage():
-    print("usage: " + sys.argv[0] + " [options]\nOptional:\n\t--tag [specific tag number of image]\n\t--repo [repository prefix]\n\t--nocache [dont use cache in docker build]\n\t--pull [force pull of image in FROM]\n\t-h, --help [this message]")
+    print("usage: python3 " + sys.argv[0] + " [options]\nRequired:\n\tONE OF OR BOTH:\n\t--client [build React front end client image]\n\t--server [build NodeJS/Express REST backend image]\nOptional:\n\t--tag [specific tag number of image]\n\t--repo [repository prefix]\n\t--nocache [dont use cache in docker build]\n\t--pull [force pull of image in FROM]\n\t-h, --help [this message]")
 
 
 def main():
+    if len(sys.argv) <= 1:
+        usage()
+        sys.exit(-1)
+
     try:
         opts, args = getopt.getopt(sys.argv[1:], "h", [
-            "tag=", "repo=", "nocache", "pull", "help"])
+            "tag=", "repo=", "nocache", "pull", "help", "client", "server"])
     except getopt.GetoptError as err:
         print(err)
         sys.exit(-1)
@@ -76,11 +76,18 @@ def main():
     pull = False
     repo = "lstavenhagen"
     nocache = False
+    react_client = False
+    rest_server = False
+
     for opt, arg in opts:
         if opt == "--tag":
             tag = arg
         elif opt == "--repo":
             repo = arg
+        elif opt == "--client":
+            react_client = True
+        elif opt == "--server":
+            rest_server = True
         elif opt == "--nocache":
             nocache = True
         elif opt == "--pull":
@@ -93,7 +100,10 @@ def main():
 
     wrapper = DockerBuildWrapper(
         repository=repo, tag=tag, nocache=nocache, pull=pull)
-    wrapper.buildAll()
+    if rest_server:
+        wrapper.buildRestServer()
+    if react_client:
+        wrapper.buildReactClient()
 
 
 if __name__ == "__main__":
