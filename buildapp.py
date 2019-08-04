@@ -58,19 +58,15 @@ class DockerBuildWrapper:
 
     def __buildImage(self, dockerfile, tag):
         try:
-            print("building from Dockerfile at {0}...".format(dockerfile))
             self.logger.info(
                 "building from Dockerfile at {0}...".format(dockerfile))
             new_image, logs = self.dockerclient.images.build(
                 path=dockerfile, tag=tag, nocache=self.nocache, pull=self.pull, rm=True)
             self.__decodeLogs(logs)
-            print("created image. ID: {0}".format(new_image.id))
             self.logger.info("created image. ID: {0}".format(new_image.id))
         except docker.errors.BuildError as berror:
-            print("build error: {0}".format(berror))
             self.logger.error("build error: {0}".format(berror))
         except docker.errors.APIError as apierror:
-            print("general api error: {0}".format(apierror))
             self.logger.error("general api error: {0}".format(apierror))
 
     def buildRestServer(self):
