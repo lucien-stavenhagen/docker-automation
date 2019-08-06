@@ -68,6 +68,9 @@ class DockerBuildWrapper:
             self.logger.error("build error: {0}".format(berror))
         except docker.errors.APIError as apierror:
             self.logger.error("general api error: {0}".format(apierror))
+        except Exception as generalerror:
+            self.logger.error(
+                "other error (is docker daemon running?): {0}".format(generalerror))
 
     def buildRestServer(self):
         self.__buildImage(self.server_dockerfile, self.server_tag)
